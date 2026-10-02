@@ -1,0 +1,4 @@
+month,town,flat_type,block,street_name,storey_range,floor_area_sqm,flat_model,lease_commence_date,remaining_lease,resale_price,storey_mid,remaining_lease_years,price_per_sqm,property_key,quality_issue,year_completed,max_floor_lvl,total_dwelling_units,property_match,transaction_year,building_age_at_sale
+2017-01-01,GEYLANG,3 ROOM,82,MACPHERSON LANE,04 TO 06,64.0,STANDARD,1968,50 YEARS 05 MONTHS,256000.0,5.0,50.416666666666664,4000.0,82|MACPHERSON LANE,;unmatched_property,,,,left_only,2017,
+2017-09-01,GEYLANG,3 ROOM,82,MACPHERSON LANE,07 TO 09,64.0,STANDARD,1968,49 YEARS 09 MONTHS,240888.0,8.0,49.75,3763.875,82|MACPHERSON LANE,;unmatched_property,,,,left_only,2017,
+2017-10-01,GEYLANG,3 ROOM,82,MACPHERSON LANE,04 TO 06,64.0,STANDARD,1968,49 YEARS 10 MONTHS,258000.0,5.0,49.833333333333336,4031.25,82|MACPHERSON LANE,;unmatched_property,,,,left_only,2017,

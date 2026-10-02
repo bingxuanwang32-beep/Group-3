@@ -1,0 +1,15 @@
+{
+  "raw_rows": 241822,
+  "clean_rows": 241819,
+  "quality_issues": 3,
+  "duplicates": 318,
+  "property_match_rate": 0.9999875941808437,
+  "date_min": "2017-01-01",
+  "date_max": "2026-10-01",
+  "train_rows": 194867,
+  "test_rows": 46952,
+  "cutoff_month": "2024-11-01",
+  "MAE": 48806.1655168842,
+  "RMSE": 68865.96711532878,
+  "R2": 0.8913555683897294
+}

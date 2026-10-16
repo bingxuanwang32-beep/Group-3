@@ -329,8 +329,7 @@ with tabs[0]:
             'Within budget (%)':st.column_config.ProgressColumn(min_value=0,max_value=100,format='%.1f%%')})
         st.caption('Affordability describes the share of *past registered sales* under a budget—not active listings. The median is for all transactions in that town and flat type.')
             st.markdown("## ✨ AI-Powered HDB Insights")
-
-    st.caption(
+        st.caption(
         "Get AI-generated insights based on your selected "
         "HDB resale transactions."
     )

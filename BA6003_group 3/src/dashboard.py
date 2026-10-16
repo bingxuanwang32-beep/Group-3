@@ -205,7 +205,7 @@ def ask_hdb_ai(messages, context):
             *messages[-10:],
         ],
         "temperature": 0.2,
-        "max_tokens": 600,
+        "max_tokens": 1200,
     }
     request = urllib.request.Request(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -216,10 +216,28 @@ def ask_hdb_ai(messages, context):
     try:
         with urllib.request.urlopen(request, timeout=40) as response:
             data = json.load(response)
-        content = data["choices"][0]["message"]["content"]
-        if not isinstance(content, str) or not content.strip():
-            raise RuntimeError("AI returned an empty response. Try again.")
-        return content
+        choice = data["choices"][0]
+message = choice.get("message", {})
+content = message.get("content")
+
+if isinstance(content, str) and content.strip():
+    return content
+
+finish_reason = choice.get("finish_reason", "unknown")
+
+if finish_reason == "length":
+    raise RuntimeError(
+        "AI ran out of output tokens. Increase max_tokens "
+        "or use a model with lower reasoning requirements."
+    )
+
+if finish_reason == "content_filter":
+    raise RuntimeError("AI response was blocked by a content filter.")
+
+raise RuntimeError(
+    f"AI returned no visible text (finish_reason={finish_reason}). "
+    "Please check the selected OpenRouter model."
+)
     except urllib.error.HTTPError as exc:
         detail = exc.read(800).decode("utf-8", errors="replace")
         # Never expose authorization headers or secrets in the UI.

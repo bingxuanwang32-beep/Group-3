@@ -9,6 +9,9 @@ import json
 import sqlite3
 import pandas as pd
 import streamlit as st
+import os
+import urllib.request
+import urllib.error
 
 try:
     import plotly.express as px
@@ -156,6 +159,85 @@ def get_data(dbpath: str, modified: int):
     d['price_per_sqm'] = d.resale_price / d.floor_area_sqm
     d['month_start'] = d.month.dt.to_period('M').dt.to_timestamp()
     return d
+def get_openrouter_setting(name):
+    try:
+        value = st.secrets.get(name)
+        if value:
+            return str(value)
+    except (FileNotFoundError, KeyError, AttributeError):
+        pass
+
+    if os.environ.get(name):
+        return os.environ[name]
+
+    env_file = ROOT / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith(name + "="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'")
+
+    return None
+
+
+def generate_hdb_insights(context):
+    api_key = get_openrouter_setting("OPENROUTER_API_KEY")
+
+    if not api_key:
+        raise RuntimeError("OpenRouter API key is missing.")
+
+    model = (
+        get_openrouter_setting("OPENROUTER_MODEL")
+        or "deepseek/deepseek-v4.1-flash"
+    )
+
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are an analyst of Singapore HDB resale transactions. "
+                    "Use only the statistics provided by the user. "
+                    "Explain key findings, affordability, and limitations. "
+                    "Do not invent numbers or claim that historical transactions "
+                    "represent currently available property listings."
+                )
+            },
+            {
+                "role": "user",
+                "content": json.dumps(context, default=str)
+            }
+        ],
+        "temperature": 0.2,
+        "max_tokens": 450
+    }
+
+    request = urllib.request.Request(
+        "https://openrouter.ai/api/v1/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=35) as response:
+            result = json.load(response)
+
+        return result["choices"][0]["message"]["content"]
+
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(
+            f"OpenRouter HTTP {e.code}. Check your model and API credits."
+        ) from None
+
+    except (urllib.error.URLError, TimeoutError):
+        raise RuntimeError("Unable to connect to OpenRouter.") from None
+
+    except (KeyError, IndexError, TypeError):
+        raise RuntimeError("Unexpected AI response.") from None
 
 def cash(n):
     return f"S${n:,.0f}" if pd.notna(n) else '—'
@@ -246,7 +328,54 @@ with tabs[0]:
             'Overall median (S$)':st.column_config.NumberColumn(format='S$%.0f'),
             'Within budget (%)':st.column_config.ProgressColumn(min_value=0,max_value=100,format='%.1f%%')})
         st.caption('Affordability describes the share of *past registered sales* under a budget—not active listings. The median is for all transactions in that town and flat type.')
+            st.markdown("## ✨ AI-Powered HDB Insights")
 
+    st.caption(
+        "Get AI-generated insights based on your selected "
+        "HDB resale transactions."
+    )
+
+    context = {
+        "location": mode,
+        "flat_types": selected_types,
+        "period": period,
+        "budget_sgd": budget,
+        "total_transactions": len(view),
+        "affordable_transactions": len(aff),
+        "affordable_percentage": (
+            round(len(aff) / len(view) * 100, 2)
+            if len(view) > 0 else 0
+        ),
+        "median_resale_price": (
+            round(float(view.resale_price.median()), 2)
+            if not view.empty else None
+        ),
+        "median_affordable_price": (
+            round(float(aff.resale_price.median()), 2)
+            if not aff.empty else None
+        ),
+        "available_towns": int(aff.town.nunique()),
+        "historical_data_latest_month": str(max_month)
+    }
+
+    if st.button("✨ Generate AI Insights", type="primary"):
+
+        with st.spinner("AI is analysing HDB market data..."):
+            try:
+                result = generate_hdb_insights(context)
+                st.session_state["ai_insights"] = result
+
+            except RuntimeError as e:
+                st.error(str(e))
+
+    if "ai_insights" in st.session_state:
+        st.markdown("### AI Market Analysis")
+        st.write(st.session_state["ai_insights"])
+
+        st.caption(
+            "AI-generated analysis based on historical HDB transactions. "
+            "Not a property valuation or current listing recommendation."
+        )
 with tabs[1]:
     st.markdown('<div class="sectionhead">The market, in perspective</div><div class="sectionnote">Historical monthly median resale prices, without applying the budget cap (to avoid distorted trends).</div>',unsafe_allow_html=True)
     defaults=[mode] if mode!='All towns' else [x for x in ['TAMPINES','WOODLANDS','PUNGGOL'] if x in towns]

@@ -333,8 +333,7 @@ with tabs[0]:
         "Get AI-generated insights based on your selected "
         "HDB resale transactions."
     )
-
-    context = {
+        context = {
         "location": mode,
         "flat_types": selected_types,
         "period": period,

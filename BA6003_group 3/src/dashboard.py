@@ -26,34 +26,37 @@ REPORT = ROOT / "output" / "quality_report.json"
 st.set_page_config(page_title="HDB Atlas · Singapore Resale Insights", page_icon="🏡", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"] {background:#F2F5F8!important;color:#162D40!important;}
 [data-testid="stHeader"] {background:transparent!important;}
 #MainMenu,footer {visibility:hidden;}
 .block-container {max-width:1350px!important;padding:1.1rem 2.3rem 4rem!important;}
-html,body,p,div,span,label,input,button {font-family:'DM Sans',sans-serif;}
-h1,h2,h3 {font-family:'Outfit',sans-serif!important;letter-spacing:-.035em!important;color:#122D44!important;}
+* {font-family:'DM Sans',Arial,sans-serif!important;}
+html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"] {font-family:'DM Sans',Arial,sans-serif!important;}
+[data-testid="stMarkdownContainer"], [data-testid="stChatMessage"], [data-testid="stChatInput"], [data-testid="stWidgetLabel"] {font-family:'DM Sans',Arial,sans-serif!important;}
+[data-testid="stChatMessage"] em, [data-testid="stMarkdownContainer"] em {font-style:normal!important;}
+h1,h2,h3 {font-family:'DM Sans',Arial,sans-serif!important;letter-spacing:-.035em!important;color:#122D44!important;}
 [data-testid="stSidebar"] {background:#102C42!important;}
 [data-testid="stSidebar"] > div {color:#E9F4F5!important;}
 .headerbar {display:flex;align-items:center;justify-content:space-between;padding:12px 6px 19px;}
-.brand {font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.055em;color:#17364B;}
+.brand {font-family:'DM Sans',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:-.055em;color:#17364B;}
 .brand span {color:#0D988A;}
 .headercaption {font-size:11px;letter-spacing:.14em;color:#798B99;font-weight:800;}
 .hero {background:linear-gradient(119deg,rgba(11,35,55,.98),rgba(17,69,78,.94)),radial-gradient(circle at 85% 10%,#1ba994,transparent 40%);border-radius:26px;padding:54px 58px 50px;min-height:280px;color:white;box-shadow:0 16px 38px rgba(14,39,54,.14);position:relative;overflow:hidden;margin-bottom:22px;}
 .hero:before {content:'';position:absolute;width:300px;height:300px;border:1px solid #ffffff25;border-radius:50%;right:100px;top:-110px;box-shadow:0 0 0 64px #ffffff08,0 0 0 126px #ffffff06;}
 .hero:after {content:'⌂';font-size:235px;font-weight:100;line-height:1;position:absolute;right:70px;bottom:-60px;color:#ffffff0d;transform:rotate(-8deg);}
 .eyebrow {display:inline-block;position:relative;z-index:1;color:#B1F0DE;letter-spacing:.18em;font-weight:800;font-size:11px;text-transform:uppercase;background:#ffffff17;padding:9px 13px;border-radius:999px;}
-.hero-title {position:relative;z-index:1;font-family:'Outfit',sans-serif;font-size:clamp(36px,4.2vw,61px);font-weight:800;line-height:1.02;letter-spacing:-.055em;color:#FFFFFF;margin:19px 0 16px;max-width:740px;}
+.hero-title {position:relative;z-index:1;font-family:'DM Sans',Arial,sans-serif;font-size:clamp(36px,4.2vw,61px);font-weight:800;line-height:1.02;letter-spacing:-.055em;color:#FFFFFF;margin:19px 0 16px;max-width:740px;}
 .hero-title i {font-style:normal;color:#6CE0C4;}
 .hero-sub {position:relative;z-index:1;font-size:15px;color:#D5E9E9;line-height:1.75;max-width:570px;}
 .tagline {margin:16px 0 4px;color:#62778B;font-size:13px;}
-.sectionhead {font-family:'Outfit',sans-serif;font-size:25px;font-weight:800;color:#12334B;letter-spacing:-.035em;margin:23px 0 4px;}
+.sectionhead {font-family:'DM Sans',Arial,sans-serif;font-size:25px;font-weight:800;color:#12334B;letter-spacing:-.035em;margin:23px 0 4px;}
 .sectionnote {font-size:13px;color:#73869A;margin:0 0 17px;}
 [data-testid="stVerticalBlockBorderWrapper"] {border-radius:20px!important;border-color:#E4ECF0!important;}
 [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stSelectbox"]) {background:#FFFFFF!important;box-shadow:0 12px 32px rgba(28,60,74,.04);}
 [data-testid="stMetric"] {background:white!important;border:1px solid #E1E9ED!important;border-radius:17px!important;padding:18px 21px!important;box-shadow:0 8px 28px rgba(24,48,64,.045);border-top:4px solid #20AD99!important;}
 [data-testid="stMetricLabel"] {font-weight:700;color:#6B8190;font-size:12px;}
-[data-testid="stMetricValue"] {font-family:'Outfit',sans-serif!important;font-size:29px!important;font-weight:800!important;color:#14334A!important;}
+[data-testid="stMetricValue"] {font-family:'DM Sans',Arial,sans-serif!important;font-size:29px!important;font-weight:800!important;color:#14334A!important;}
 [data-testid="stTabs"] [role="tablist"] {background:#FFFFFF;border:1px solid #E2EAF0;border-radius:14px;padding:7px 9px;gap:9px;box-shadow:0 4px 18px #223e5510;}
 [data-testid="stTabs"] button[role="tab"] {font-weight:800;color:#657D8E!important;border-radius:10px;padding:9px 16px;}
 [data-testid="stTabs"] button[aria-selected="true"] {background:#E0F5EF!important;color:#08695E!important;}
@@ -200,8 +203,9 @@ def ask_hdb_ai(messages, context):
         "For price trends, compare the first and last observed monthly medians in the "
         "supplied trend summaries; mention that these are observed months, not forecasts. "
         "When the data is insufficient, state the limitation. "
-        "Answer in the language of the user's question, in no more than 3 bullets or "
-        "120 words unless the user asks for more detail."
+        "Answer in the language of the user's question, in no more than 3 short lines or "
+        "120 words unless the user asks for more detail. Use plain text with simple hyphen bullets; "
+        "do not use Markdown bold or italics, and keep labels and numbers unformatted."
     )
     payload = {
         "model": model,
@@ -378,7 +382,7 @@ def cash(n):
 def base_chart(fig, height=345):
     fig.update_layout(height=height, margin=dict(l=5,r=8,t=18,b=7),
                       paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',
-                      font=dict(family='DM Sans', color='#465A6C',size=12),
+                      font=dict(family='DM Sans, Arial, sans-serif', color='#465A6C',size=12),
                       legend=dict(orientation='h',yanchor='bottom',y=1.02,x=0),
                       hovermode='x unified')
     fig.update_xaxes(showgrid=False,zeroline=False)
@@ -449,7 +453,7 @@ with tabs[0]:
                             labels={'color':'Within budget (%)','x':'Flat type','y':'Town'},text_auto='.0f',aspect='auto')
             chart.update_traces(texttemplate='%{z:.0f}%', hovertemplate='%{y} · %{x}<br>Within budget: %{z:.1f}%<extra></extra>')
             chart.update_layout(height=max(280, min(850, len(matrix)*30+130)), margin=dict(l=8,r=6,t=10,b=0),
-                paper_bgcolor='rgba(0,0,0,0)',font=dict(family='DM Sans',color='#44576A'),coloraxis_colorbar=dict(title='%'))
+                paper_bgcolor='rgba(0,0,0,0)',font=dict(family='DM Sans, Arial, sans-serif',color='#44576A'),coloraxis_colorbar=dict(title='%'))
             st.plotly_chart(chart,use_container_width=True)
         else:
             st.dataframe(matrix.style.format('{:.0f}%').background_gradient(cmap='GnBu',axis=None),use_container_width=True)

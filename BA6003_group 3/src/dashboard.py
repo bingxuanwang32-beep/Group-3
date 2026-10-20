@@ -197,8 +197,11 @@ def ask_hdb_ai(messages, context):
         "and 25th–75th percentile range for the matching town and flat type. If no "
         "matching summary is supplied, ask the user to adjust the dashboard filters. "
         "Do not infer mortgage payments, commute times, amenities or current availability. "
+        "For price trends, compare the first and last observed monthly medians in the "
+        "supplied trend summaries; mention that these are observed months, not forecasts. "
         "When the data is insufficient, state the limitation. "
-        "Answer in the language of the user's question, concisely."
+        "Answer in the language of the user's question, in no more than 3 bullets or "
+        "120 words unless the user asks for more detail."
     )
     payload = {
         "model": model,
@@ -311,6 +314,41 @@ def build_ai_context(view, affordable, recommendation_data, selected_town,
             "median_price_sgd": value(row.median_price_sgd),
         } for row in candidates.itertuples(index=False)]
 
+    # Supply compact time-series summaries so the assistant can answer trend
+    # questions without receiving every transaction row.
+    trend_data = recommendation_data
+    if selected_town != "All towns":
+        trend_data = trend_data.loc[trend_data.town.eq(selected_town)]
+    elif not trend_data.empty:
+        top_trend_towns = (trend_data.groupby("town", observed=True)
+                           .size().sort_values(ascending=False).head(3).index)
+        trend_data = trend_data.loc[trend_data.town.isin(top_trend_towns)]
+
+    monthly_trend_summary = []
+    if not trend_data.empty:
+        monthly = (trend_data.groupby(["town", "flat_type", "month_start"], observed=True)
+                   .agg(median_price_sgd=("resale_price", "median"),
+                        transactions=("resale_price", "size"))
+                   .reset_index())
+        for (town, flat_type), series in monthly.groupby(["town", "flat_type"], observed=True):
+            series = series.sort_values("month_start")
+            first, last = series.iloc[0], series.iloc[-1]
+            change = float(last.median_price_sgd - first.median_price_sgd)
+            first_price = float(first.median_price_sgd)
+            monthly_trend_summary.append({
+                "town": str(town),
+                "flat_type": str(flat_type),
+                "first_observed_month": str(first.month_start.strftime("%Y-%m")),
+                "first_month_median_price_sgd": value(first_price),
+                "first_month_transactions": int(first.transactions),
+                "last_observed_month": str(last.month_start.strftime("%Y-%m")),
+                "last_month_median_price_sgd": value(last.median_price_sgd),
+                "last_month_transactions": int(last.transactions),
+                "change_sgd": value(change),
+                "change_pct": round(change / first_price * 100, 2) if first_price else None,
+                "months_with_sales": int(len(series)),
+            })
+
     return {
         "scope": "Completed historical HDB resale transactions; not active listings",
         "data_through": str(data_through.date()),
@@ -331,6 +369,7 @@ def build_ai_context(view, affordable, recommendation_data, selected_town,
         ),
         "recommended_town_flat_type_candidates": recommendation_candidates,
         "historical_price_by_town_and_flat_type": market_summary,
+        "monthly_price_trend_summaries": monthly_trend_summary,
     }
 
 def cash(n):

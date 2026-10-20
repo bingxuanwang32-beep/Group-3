@@ -32,6 +32,21 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"] {background:
 #MainMenu,footer {visibility:hidden;}
 .block-container {max-width:1350px!important;padding:1.1rem 2.3rem 4rem!important;}
 * {font-family:'DM Sans',Arial,sans-serif!important;}
+/* Keep Streamlit's ligature icon font intact for chat avatars and widget icons. */
+.material-symbols-rounded,
+.material-icons,
+[data-testid="stIconMaterial"] {
+  font-family:"Material Symbols Rounded","Material Icons"!important;
+  font-weight:normal!important;
+  font-style:normal!important;
+  letter-spacing:normal!important;
+  text-transform:none!important;
+  white-space:nowrap!important;
+  word-wrap:normal!important;
+  direction:ltr!important;
+  -webkit-font-feature-settings:"liga";
+  -webkit-font-smoothing:antialiased;
+}
 html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"] {font-family:'DM Sans',Arial,sans-serif!important;}
 [data-testid="stMarkdownContainer"], [data-testid="stChatMessage"], [data-testid="stChatInput"], [data-testid="stWidgetLabel"] {font-family:'DM Sans',Arial,sans-serif!important;}
 [data-testid="stChatMessage"] em, [data-testid="stMarkdownContainer"] em {font-style:normal!important;}
